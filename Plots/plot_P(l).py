@@ -1,4 +1,3 @@
-import sgp4
 import numpy as np
 from matplotlib import pyplot
 
