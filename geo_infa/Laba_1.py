@@ -52,57 +52,58 @@ time_s = [int(time[0:2]), int(time[3:5]), int(time[6:8]), int(time[9:11])]
 
 
 # Определение эливации и азимута во время виденья спутника
-# while time_s != time_f:
-#     ts = load.timescale()
-#     t = ts.utc(2022, 3, time_s[1], time_s[2], time_s[3], 18)
-#     topocentric = dif.at(t)
-#     alt, az, dis = topocentric.altaz()
-#     if alt.degrees > 0:
-#     # if int(str(alt)[0:2]) > 0:
-#         time_start_look.append(time_s)
-#         eliv.append(int(str(alt)[0:2]))
-#         if str(az)[3] == 'd':
-#             azim.append(int(str(az)[0:3]))
-#         else:
-#             azim.append(int(str(az)[0:2]))
-#     minute_plus(time_s)
-# eliv.remove(0)
-# print(len(eliv))
-# print(len(azim))
+while time_s != time_f:
+    ts = load.timescale()
+    t = ts.utc(2022, 3, time_s[1], time_s[2], time_s[3], 18)
+    topocentric = dif.at(t)
+    alt, az, dis = topocentric.altaz()
+    if alt.degrees > 0:
+    # if int(str(alt)[0:2]) > 0:
+    #     time_start_look.append(time_s)
+        eliv.append(int(str(alt)[0:2]))
+        if str(az)[3] == 'd':
+            azim.append(int(str(az)[0:3]))
+        else:
+            azim.append(int(str(az)[0:2]))
+    minute_plus(time_s)
+eliv.remove(0)
+print(len(eliv))
+print(len(azim))
 
 # График орбиты
-# a, b = 6378.137, 6356.7523142
+a, b = 6378.137, 6356.7523142
+
+ecis = np.array(ecis)
+x, y, z = ecis[:, 0], ecis[:, 1], ecis[:, 2]
+
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.plot(x, y, z)
+
+rx, ry, rz = a, a, b
+u = np.linspace(0, 2 * np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+x = rx * np.outer(np.cos(u), np.sin(v))
+y = ry * np.outer(np.sin(u), np.sin(v))
+z = rz * np.outer(np.ones_like(u), np.cos(v))
 #
-# ecis = np.array(ecis)
-# x, y, z = ecis[:, 0], ecis[:, 1], ecis[:, 2]
-#
-# fig = plt.figure(figsize=(8, 8))
-# ax = fig.add_subplot(111, projection='3d')
-#
-# ax.plot(x, y, z)
-#
-# rx, ry, rz = a, a, b
-# u = np.linspace(0, 2 * np.pi, 100)
-# v = np.linspace(0, np.pi, 100)
-# x = rx * np.outer(np.cos(u), np.sin(v))
-# y = ry * np.outer(np.sin(u), np.sin(v))
-# z = rz * np.outer(np.ones_like(u), np.cos(v))
-# #
-# ax.plot_wireframe(x, y, z, alpha=0.1)
-#
-#
-# max_radius = max(rx, ry, rz)
-# for axis in 'xyz':
-#     getattr(ax, 'set_{}lim'.format(axis))((-max_radius, max_radius))
+ax.plot_wireframe(x, y, z, alpha=0.1)
+
+
+max_radius = max(rx, ry, rz)
+for axis in 'xyz':
+    getattr(ax, 'set_{}lim'.format(axis))((-max_radius, max_radius))
 # plt.show()
-#
-#
-# # График во время виденья спутника
-# # Очень странный получился
-# fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-# ax.plot(np.array(eliv), (np.array(azim) * (-1) + 90))
-# ax.set_rmax(90)
-# ax.set_rmin(0)
-# ax.set_rticks([90,60,30,0], [" "]*4)
-# ax.grid(True)
+plt.savefig("Plot_1")
+
+# График во время виденья спутника
+# Очень странный получился
+fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+ax.plot(np.array(eliv), (np.array(azim)))
+ax.set_rmax(90)
+ax.set_rmin(0)
+ax.set_rticks([90,60,30,0], [" "]*4)
+ax.grid(True)
 # plt.show()
+plt.savefig("Plot_2.png")
